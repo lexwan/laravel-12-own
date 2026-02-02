@@ -90,7 +90,7 @@ return [
      * ```
      */
     'servers' => [
-        'Local' => env('APP_URL', 'http://localhost') . '/api',
+        'Local' => 'http://127.0.0.1:8000/api',
     ],
 
     /**
@@ -131,7 +131,7 @@ return [
 
     'middleware' => [
         'web',
-        RestrictedDocsAccess::class,
+        // RestrictedDocsAccess::class,
     ],
 
     'extensions' => [],
