@@ -38,16 +38,33 @@ class UserController extends Controller
     }
 
     /**
-     * Update user profile.
+     * Update user profile (with optional avatar).
      */
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
-        $user = $this->userService->updateProfile(
-            $request->user(),
-            $request->validated()
-        );
+        $user = $request->user();
+        $data = $request->validated();
         
-        $responseData = $user->toArray();
+        // Handle avatar upload if present
+        if ($request->hasFile('avatar')) {
+            $request->validate([
+                'avatar' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:2048']
+            ]);
+            
+            $avatarUrl = $this->userService->uploadAvatar(
+                $user,
+                $request->file('avatar')
+            );
+        }
+        
+        // Update profile data (exclude avatar file from data)
+        $profileData = collect($data)->except('avatar')->toArray();
+        if (!empty($profileData)) {
+            $user = $this->userService->updateProfile($user, $profileData);
+        }
+        
+        // Get updated profile with avatar URL
+        $responseData = $user->fresh()->toArray();
         $responseData['avatar_url'] = $user->avatar ? Storage::disk('public')->url($user->avatar) : null;
         
         return $this->successResponse(
