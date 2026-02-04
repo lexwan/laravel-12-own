@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,7 +22,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 
-// Public search routes (no auth required)
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{category}', [CategoryController::class, 'show']);
+
 Route::get('/search', [SearchController::class, 'searchProducts']);
 Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
 Route::get('/search/filters', [SearchController::class, 'filterOptions']);
@@ -40,6 +43,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/profile/avatar', [UserController::class, 'uploadAvatar']);
     Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar']);
     Route::get('/profile/activities', [UserController::class, 'activities']);
+
+    //categories
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{category}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
     
     // Logout
     Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
@@ -53,4 +61,9 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::patch('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+    
+    // Product Images - admin only
+    Route::post('/products/{product}/images', [ProductController::class, 'uploadImages']);
+    Route::delete('/products/{product}/images/{image}', [ProductController::class, 'deleteImage']);
+    Route::put('/products/{product}/images/{image}/primary', [ProductController::class, 'setPrimaryImage']);
 });

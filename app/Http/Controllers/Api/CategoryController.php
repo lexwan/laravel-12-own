@@ -3,102 +3,85 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Services\CategoryService;
-use Illuminate\Http\Request;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
-    protected CategoryService $categoryService;
+    use ApiResponse;
 
-    public function __construct(CategoryService $categoryService)
-    {
-        $this->categoryService = $categoryService;
-
-        //admin 
-        $this->middleware(['auth:sanctum', 'role:admin'])
-        ->only(['store', 'update', 'destroy']);
+    public function __construct(
+        protected CategoryService $categoryService
+    ) {
+        // Admin only for CUD operations
+        $this->middleware(['auth:api', 'role:admin'])
+            ->only(['store', 'update', 'destroy']);
     }
 
     /**
-     * List aktif kategory
-    */
-    public function index ()
+     * List active categories.
+     */
+    public function index(): JsonResponse
     {
         $categories = $this->categoryService->getAllCategories();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'list categories',
-            'data' => $categories,
-        ]);
+        return $this->successResponse(
+            CategoryResource::collection($categories),
+            'Categories retrieved successfully'
+        );
     }
 
     /**
-     * Create baru kategori (admin)
+     * Create new category (admin only).
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
-        $validated = $request->validated([
-            'name' => 'required|string|max:225',
-            'description' =>'nullable|string',
-            'is_active' => 'boolean',
-        ]);
+        $category = $this->categoryService->createCategory($request->validated());
 
-        $category = $this->categoryService->createCategory($validated);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Category created',
-            'data' => $category,
-        ], 201);
+        return $this->createdResponse(
+            new CategoryResource($category),
+            'Category created successfully'
+        );
     }
 
     /**
-     * show category with products
+     * Show category with products.
      */
-    public function show(Category $category)
+    public function show(Category $category): JsonResponse
     {
-        $category = $this->categoryService->getCategoryWithProducts($category);
+        $categoryWithProducts = $this->categoryService->getCategoryWithProducts($category);
 
-        return response()->json([
-            'status' => true,
-            'message' => "category detail",
-            'data' => $category,
-        ]);
+        return $this->successResponse(
+            new CategoryResource($categoryWithProducts),
+            'Category retrieved successfully'
+        );
     }
 
     /**
-     *  update category
+     * Update category (admin only).
      */
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ]);
+        $updatedCategory = $this->categoryService->updateCategory($category, $request->validated());
 
-        $category = $this->categoryServices->updateCategory($category, $validated);
-
-        return response()->json([
-            'status' => true,
-            'message'=> 'Category Updated',
-            'data' => $category,
-        ]);
+        return $this->successResponse(
+            new CategoryResource($updatedCategory),
+            'Category updated successfully'
+        );
     }
 
     /**
-     * Delete Category (admin)
+     * Delete category (admin only).
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): JsonResponse
     {
         $this->categoryService->deleteCategory($category);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Category Deleted',
-            'data' => null,
-        ]);
+        return $this->deletedResponse('Category deleted successfully');
     }
 }
