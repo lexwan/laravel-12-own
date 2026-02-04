@@ -18,11 +18,7 @@ class UserController extends Controller
     public function __construct(
         private UserService $userService,
         private ActivityLogService $activityLogService
-    ) {
-        $this->middleware('auth:api');
-        $this->middleware('permission:view profile', ['only' => ['profile']]);
-        $this->middleware('permission:edit profile', ['only' => ['updateProfile', 'uploadAvatar', 'deleteAvatar']]);
-    }
+    ) {}
 
     /**
      * Get user profile.

@@ -40,8 +40,7 @@ Route::middleware('auth:api')->group(function () {
     // User Profile Management
     Route::get('/profile', [UserController::class, 'profile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
-    Route::post('/profile/avatar', [UserController::class, 'uploadAvatar']);
-    Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar']);
+    Route::post('/profile/update', [UserController::class, 'updateProfile']);
     Route::get('/profile/activities', [UserController::class, 'activities']);
 
     //categories
