@@ -44,7 +44,12 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->accessToken;
 
         return $this->createdResponse([
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 'User registered successfully');
@@ -75,14 +80,23 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->accessToken;
 
-        return $this->successResponse([
-            'user' => $user,
-            'roles' => $user->getRoleNames(),
-            'permissions' => $user->getAllPermissions()->pluck('name'),
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ], 'Login successful');
+        return response()->json([
+            'success' => true,
+            'message' => 'Login successful',
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ],
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]
+        ]);
     }
+
 
     /**
      * Logout user (revoke token).
