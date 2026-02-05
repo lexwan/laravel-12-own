@@ -26,6 +26,7 @@ class UpdateProductRequest extends FormRequest
         
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['sometimes', 'nullable', 'string'],
             'sku' => [
                 'sometimes',
                 'required',
@@ -51,6 +52,7 @@ class UpdateProductRequest extends FormRequest
         return [
             'name.required' => 'Product name is required.',
             'name.max' => 'Product name must not exceed 255 characters.',
+            'description.string' => 'Description must be a valid text.',
             'sku.required' => 'SKU is required.',
             'sku.unique' => 'This SKU is already in use.',
             'price.required' => 'Price is required.',

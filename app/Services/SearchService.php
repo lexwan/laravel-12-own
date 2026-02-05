@@ -18,11 +18,12 @@ class SearchService
     {
         $query = Product::query();
 
-        // Search by keyword (name, sku)
+        // Search by keyword (name, sku, description)
         if (!empty($filters['q'])) {
             $query->where(function (Builder $q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['q'] . '%')
-                  ->orWhere('sku', 'like', '%' . $filters['q'] . '%');
+                  ->orWhere('sku', 'like', '%' . $filters['q'] . '%')
+                  ->orWhere('description', 'like', '%' . $filters['q'] . '%');
             });
         }
 
@@ -86,6 +87,7 @@ class SearchService
 
         return Product::where('name', 'like', '%' . $query . '%')
             ->orWhere('sku', 'like', '%' . $query . '%')
+            ->orWhere('description', 'like', '%' . $query . '%')
             ->limit($limit)
             ->pluck('name')
             ->toArray();

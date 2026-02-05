@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             CategorySeeder::class,
+            ProductSeeder::class,
         ]);
 
         // Optionally create a test admin user

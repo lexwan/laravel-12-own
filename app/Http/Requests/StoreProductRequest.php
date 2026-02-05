@@ -23,6 +23,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'sku' => ['required', 'string', 'max:255', 'unique:products,sku'],
             'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'stock' => ['required', 'integer', 'min:0'],
@@ -42,6 +43,7 @@ class StoreProductRequest extends FormRequest
         return [
             'name.required' => 'Product name is required.',
             'name.max' => 'Product name must not exceed 255 characters.',
+            'description.string' => 'Description must be a valid text.',
             'sku.required' => 'SKU is required.',
             'sku.unique' => 'This SKU is already in use.',
             'price.required' => 'Price is required.',
